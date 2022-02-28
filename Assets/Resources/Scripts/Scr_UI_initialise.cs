@@ -36,32 +36,7 @@ public class Scr_UI_initialise : MonoBehaviour
         
     
     }
-    void LoadList()
-    {
-        var list_text = "My Saved List:";
-
-        var currentitem = "";
-
-        StreamReader Savedata = new StreamReader(FilePath + FileName);
-
-        currentitem = Savedata.ReadLine();
-
-        while (Savedata.EndOfStream == false)
-        {
-            currentitem = Savedata.ReadLine();
-
-            list_text += "\n" + currentitem;
-
-
-            UI_List.Add(currentitem);
-
-            UIList_Count += 1;
-        }
-
-        Savedata.Close();
-
-        UpdateList();
-    }
+    
     void UpdateList()
     {
         var btn_save_btn_text = List.GetComponent<Text>();
@@ -102,20 +77,13 @@ public class Scr_UI_initialise : MonoBehaviour
     }
     public void Savegame()
     {
-        var list_text = "My Saved List:";
+        
 
-        for (var i = 0; i < UIList_Count; i++)
-        {
-            list_text += "\n" + UI_List[i];
-        }
+    }
 
-        StreamWriter Savedata = new StreamWriter(FilePath+FileName);
-
-        Savedata.Write(list_text);
-
-        Savedata.Close();
-
-
+    void LoadList()
+    {
+        
     }
     void EncryptSave()
     { 
