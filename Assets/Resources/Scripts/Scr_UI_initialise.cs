@@ -17,7 +17,7 @@ public class Scr_UI_initialise : MonoBehaviour
 
     public int UIList_MaxCount=10;
 
-    private string FileName = "YourList.sav";
+    private string FileName = "YourList.txt";
 
     private string FilePath = "Assets/Resources/Saves/";
 
