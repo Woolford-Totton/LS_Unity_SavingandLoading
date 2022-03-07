@@ -96,19 +96,7 @@ public class Scr_UI_initialise : MonoBehaviour
             Encrypt our data
          */
 
-        char[] encryptdata = list_text.ToCharArray();
-        
-
-
-        for (var i = 0; i < encryptdata.Length; i++)
-        {
-            encryptdata[i] = System.Convert.ToChar(encryptdata[i] + Adjust_ASCII_Amount);
-
-            
-        }
-        list_text=new string(encryptdata);
-
-        
+        EncryptSave(ref list_text);               
 
         StreamWriter Savedata = new StreamWriter(FilePath+FileName);
 
@@ -137,34 +125,30 @@ public class Scr_UI_initialise : MonoBehaviour
 
         Savedata.Close();
 
+        DecryptSave(ref currentitem);
 
-        char[] decryptdata = currentitem.ToCharArray();
+        char[] ReadableSavedata = currentitem.ToCharArray();
 
-        for (var i = 0; i < decryptdata.Length; i++)
-        {
-            decryptdata[i] = System.Convert.ToChar(decryptdata[i] - Adjust_ASCII_Amount);
-
-
-        }
-        list_text = new string(decryptdata);
+       
+        list_text = new string(ReadableSavedata);
 
         currentitem = "";
         var recordnextitem = false;
         var countdown_to_next_item = 0;
 
-        for (var i = 0; i < decryptdata.Length; i++)
+        for (var i = 0; i < ReadableSavedata.Length; i++)
         {
             if (recordnextitem == true)
             {
                 recordnextitem = false;
 
-                currentitem = decryptdata[i].ToString();
+                currentitem = ReadableSavedata[i].ToString();
 
                 UI_List.Add(currentitem);
 
                 UIList_Count += 1;
             }
-            if (decryptdata[i] == System.Convert.ToChar("\n"))
+            if (ReadableSavedata[i] == System.Convert.ToChar("\n"))
             {
                 recordnextitem = true;
                 countdown_to_next_item = 2;                
@@ -176,14 +160,32 @@ public class Scr_UI_initialise : MonoBehaviour
         UpdateList();
     }
     
-    void EncryptSave()
+    void EncryptSave(ref string SaveData)
     {
-       
+        char[] encryptdata = SaveData.ToCharArray();
+
+
+
+        for (var i = 0; i < encryptdata.Length; i++)
+        {
+            encryptdata[i] = System.Convert.ToChar(encryptdata[i] + Adjust_ASCII_Amount);
+
+
+        }
+        SaveData= new string(encryptdata);
     }
 
-    void DecryptSave()
-    { 
-    
+    void DecryptSave(ref string SaveData)
+    {
+        char[] decryptdata = SaveData.ToCharArray();
+
+        for (var i = 0; i < decryptdata.Length; i++)
+        {
+            decryptdata[i] = System.Convert.ToChar(decryptdata[i] - Adjust_ASCII_Amount);
+
+
+        }
+        SaveData = new string(decryptdata);
     }
 
 }
