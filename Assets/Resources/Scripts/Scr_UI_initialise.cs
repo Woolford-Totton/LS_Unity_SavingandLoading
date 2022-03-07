@@ -22,6 +22,8 @@ public class Scr_UI_initialise : MonoBehaviour
 
     private string FilePath = "Assets/Resources/Saves/";
 
+    private int Adjust_ASCII_Amount = 10;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -118,37 +120,7 @@ public class Scr_UI_initialise : MonoBehaviour
 
         btn_save_btn_text.verticalOverflow = VerticalWrapMode.Overflow;
 
-        var list_text = "My Saved List:";
-
-        if (System.IO.File.Exists(FilePath+FileName))
-        {
-            var currentitem = "";
-
-            StreamReader Savedata = new StreamReader(FilePath + FileName);
-
-            currentitem = Savedata.ReadLine();
-
-            while (Savedata.EndOfStream == false)
-            {
-                currentitem = Savedata.ReadLine();
-
-                list_text +="\n" + currentitem;
-
-
-                UI_List.Add(currentitem);
-
-                UIList_Count += 1;
-            }
-
-
-
-
-            
-
-            Savedata.Close();
-        }
-
-        btn_save_btn_text.text = list_text;
+        
 
         btn_save_transform = UIButtons[UIButtons_Count].GetComponent<RectTransform>();
 
@@ -157,9 +129,11 @@ public class Scr_UI_initialise : MonoBehaviour
 
         UIButtons_Count += 1;
 
+        LoadList();
+
         #endregion
 
-       
+
 
 
     }
@@ -211,16 +185,26 @@ public class Scr_UI_initialise : MonoBehaviour
 
 
     }
-    void Savegame()
+    public void Savegame()
     {
-        var list_text = "My Saved List:";
+        /*
+            Get Data to Save
+         */
+
+        string list_text = "My Saved List:";
 
         for (var i = 0; i < UIList_Count; i++)
         {
             list_text += "\n" + UI_List[i];
         }
 
-        StreamWriter Savedata = new StreamWriter(FilePath+FileName);
+        /*
+            Encrypt our data
+         */
+
+        EncryptSave(ref list_text);
+
+        StreamWriter Savedata = new StreamWriter(FilePath + FileName);
 
         Savedata.Write(list_text);
 
@@ -228,14 +212,86 @@ public class Scr_UI_initialise : MonoBehaviour
 
 
     }
-    void EncryptSave()
-    { 
-        
+    void LoadList()
+    {
+        var list_text = "My Saved List:";
+
+        var currentitem = "";
+
+        StreamReader Savedata = new StreamReader(FilePath + FileName);
+
+        currentitem = Savedata.ReadLine();
+
+        while (Savedata.EndOfStream == false)
+        {
+            currentitem += Savedata.ReadLine();
+
+
+        }
+
+        Savedata.Close();
+
+        DecryptSave(ref currentitem);
+
+        char[] ReadableSavedata = currentitem.ToCharArray();
+
+
+        list_text = new string(ReadableSavedata);
+
+        currentitem = "";
+        var recordnextitem = false;
+       
+
+        for (var i = 0; i < ReadableSavedata.Length; i++)
+        {
+            if (recordnextitem == true)
+            {
+                recordnextitem = false;
+
+                currentitem = ReadableSavedata[i].ToString();
+
+                UI_List.Add(currentitem);
+
+                UIList_Count += 1;
+            }
+            if (ReadableSavedata[i] == System.Convert.ToChar("\n"))
+            {
+                recordnextitem = true;              
+            }
+
+        }
+
+
+        UpdateList();
     }
 
-    void DecryptSave()
-    { 
-    
+    void EncryptSave(ref string SaveData)
+    {
+        char[] encryptdata = SaveData.ToCharArray();
+
+
+
+        for (var i = 0; i < encryptdata.Length; i++)
+        {
+            encryptdata[i] = System.Convert.ToChar(encryptdata[i] + Adjust_ASCII_Amount);
+
+
+        }
+        SaveData = new string(encryptdata);
     }
+
+    void DecryptSave(ref string SaveData)
+    {
+        char[] decryptdata = SaveData.ToCharArray();
+
+        for (var i = 0; i < decryptdata.Length; i++)
+        {
+            decryptdata[i] = System.Convert.ToChar(decryptdata[i] - Adjust_ASCII_Amount);
+
+
+        }
+        SaveData = new string(decryptdata);
+    }
+
 
 }
