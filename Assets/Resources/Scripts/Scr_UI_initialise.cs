@@ -19,9 +19,11 @@ public class Scr_UI_initialise : MonoBehaviour
 
     public int UIList_MaxCount=10;
 
-    private string FileName = "YourList.txt";
+    private string FileName = "YourList.sav";
 
     private string FilePath = "Assets/Resources/Saves/";
+
+    private int Adjust_ASCII_Amount = 10;
 
     // Start is called before the first frame update
     void Start()
@@ -79,12 +81,34 @@ public class Scr_UI_initialise : MonoBehaviour
     }
     public void Savegame()
     {
-        var list_text = "My Saved List:";
+        /*
+            Get Data to Save
+         */
+
+        string list_text = "My Saved List:";
 
         for (var i = 0; i < UIList_Count; i++)
         {
             list_text += "\n" + UI_List[i];
         }
+
+        /*
+            Encrypt our data
+         */
+
+        char[] encryptdata = list_text.ToCharArray();
+        
+
+
+        for (var i = 0; i < encryptdata.Length; i++)
+        {
+            encryptdata[i] = System.Convert.ToChar(encryptdata[i] + Adjust_ASCII_Amount);
+
+            
+        }
+        list_text=new string(encryptdata);
+
+        
 
         StreamWriter Savedata = new StreamWriter(FilePath+FileName);
 
@@ -106,23 +130,55 @@ public class Scr_UI_initialise : MonoBehaviour
 
         while (Savedata.EndOfStream == false)
         {
-            currentitem = Savedata.ReadLine();
-
-            list_text += "\n" + currentitem;
+            currentitem += Savedata.ReadLine();
 
 
-            UI_List.Add(currentitem);
-
-            UIList_Count += 1;
         }
 
         Savedata.Close();
 
+
+        char[] decryptdata = currentitem.ToCharArray();
+
+        for (var i = 0; i < decryptdata.Length; i++)
+        {
+            decryptdata[i] = System.Convert.ToChar(decryptdata[i] - Adjust_ASCII_Amount);
+
+
+        }
+        list_text = new string(decryptdata);
+
+        currentitem = "";
+        var recordnextitem = false;
+        var countdown_to_next_item = 0;
+
+        for (var i = 0; i < decryptdata.Length; i++)
+        {
+            if (recordnextitem == true)
+            {
+                recordnextitem = false;
+
+                currentitem = decryptdata[i].ToString();
+
+                UI_List.Add(currentitem);
+
+                UIList_Count += 1;
+            }
+            if (decryptdata[i] == System.Convert.ToChar("\n"))
+            {
+                recordnextitem = true;
+                countdown_to_next_item = 2;                
+            }
+            
+        }
+        
+
         UpdateList();
     }
+    
     void EncryptSave()
-    { 
-        
+    {
+       
     }
 
     void DecryptSave()
